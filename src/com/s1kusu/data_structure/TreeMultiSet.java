@@ -2,7 +2,7 @@ package com.s1kusu.data_structure;
 
 import java.util.*;
 
-class MultiTreeSet<K> extends TreeMap<K, Long> {
+class TreeMultiSet<K> extends TreeMap<K, Long> {
 
     public long update(K key, long val){
         if(!contains(key)){
