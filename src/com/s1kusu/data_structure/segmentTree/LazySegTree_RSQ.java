@@ -4,7 +4,7 @@ package com.s1kusu.data_structure.segmentTree;
  * Lazy Segment Tree - Range Sum Query.
  *
  */
-public class LazySegTree_RSQ {
+class LazySegTree_RSQ {
 
     public int n;
     public int size;
@@ -49,14 +49,14 @@ public class LazySegTree_RSQ {
     }
 
     /**
-     * 区間[a, b)での○○を求めます.
+     * 区間[a, b)にxを加算します.
      * 最初に呼ぶ際は、query(a, b, x, 0, 0, size)として呼ぶ.
-     * @param a 求める区間の下限（含む）
-     * @param b 求める区間の上限（含まない）
-     * @param k 確認するノードのindex
-     * @param l 確認するノードの下限（含む）
-     * @param r 確認するノードの上限（含まない）
-     * @return 区間[a, b)での○○
+     * @param a 加算する区間の下限（含む）
+     * @param b 加算する区間上限（含まない）
+     * @param x 加算する値
+     * @param k 加算するノードのindex
+     * @param l 加算するノードの下限（含む）
+     * @param r 加算するノードの上限（含まない）
      */
     public void add(int a, int b, int x, int k, int l, int r){
         eval(k, l, r);
@@ -75,6 +75,16 @@ public class LazySegTree_RSQ {
         add(a, b, x, 2*k+1, l, (l+r)/2);
         add(a, b, x, 2*k+2, (l+r)/2, r);
         data[k] = data[2*k+1] + data[2*k+2];
+    }
+
+    /**
+     * 区間[a, b)にxを加算します.
+     * @param a 加算する区間の下限（含む）
+     * @param b 加算する区間上限（含まない）
+     * @param x 加算する値
+     */
+    public void add(int a, int b, int x){
+        add(a, b, x, 0, 0, size);
     }
 
     /**
@@ -97,5 +107,15 @@ public class LazySegTree_RSQ {
         long vl = sum(a, b, 2*k+1, l, (l+r)/2);
         long vr = sum(a, b, 2*k+2, (l+r)/2, r);
         return vl + vr;
+    }
+
+    /**
+     * 区間[a, b)の和を求めます.
+     * @param a 求める区間の下限（含む）
+     * @param b 求める区間の上限（含まない）
+     * @return 区間[a, b)の和
+     */
+    public long sum(int a, int b){
+        return sum(a, b, 0, 0, size);
     }
 }

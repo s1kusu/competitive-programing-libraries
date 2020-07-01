@@ -4,20 +4,21 @@ import java.util.*;
 
 class LCA {
 
-    public int n;
-    public int root;
-    public int[][] pars;
-    public int[] depth;
-    public int k;
+    public int n; // 頂点数
+    public int root; // 根
+    public int[][] pars; // pars[i][j]:頂点iの2^j個上の親
+    public int[] depth; // 根からの深さ（根は０）
+    public int k; //parsにおいて2^k個上の親まで保持する
 
-    public LCA(int n, int root, int[][] graph){
+    // tree[i][j]:頂点iの子を保持する
+    public LCA(int n, int root, int[][] tree){
         this.n = n;
         this.root = root;
         k = Integer.toBinaryString(n).length();
         depth = new int[n];
         pars = new int[n][k+1];
         Arrays.fill(depth, -1);
-        dfs(root, -1, 0, graph);
+        dfs(root, -1, 0, tree);
         for (int i = 0; i < k; i++) {
             for (int j = 0; j < n; j++) {
                 if(pars[j][i] < 0) pars[j][i+1] = -1;

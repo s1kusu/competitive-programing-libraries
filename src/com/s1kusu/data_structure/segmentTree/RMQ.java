@@ -46,7 +46,7 @@ public class RMQ {
      * @param r 確認するノードの上限（含まない）
      * @return 区間[a, b)での最小値
      */
-    public int query(int a, int b, int k, int l, int r){
+    private int query(int a, int b, int k, int l, int r){
         if(r <= a || b <= l) return Integer.MAX_VALUE;
 
         if(a <= l && r <= b) return data[k];
@@ -54,5 +54,9 @@ public class RMQ {
         int vl = query(a, b, k*2+1, l, (l+r)/2);
         int vr = query(a, b, k*2+2, (l+r)/2, r);
         return Math.min(vl, vr);
+    }
+
+    public int query(int a, int b){
+        return query(a, b, 0, 0, size);
     }
 }

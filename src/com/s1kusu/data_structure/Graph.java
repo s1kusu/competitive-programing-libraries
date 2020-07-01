@@ -128,4 +128,39 @@ class Graph {
         return graph;
     }
 
+    /**
+     * 辺の情報から重み付き有向グラフ（隣接リスト）を生成する。
+     * 各頂点に1~nの番号が付けられたinputを前提とし、返却する配列にはそのinput-1のとして格納する。
+     * 計算量：O(m + n)
+     * @param sc 標準入力を読み込むためのスキャナ
+     * @param n 頂点の数
+     * @param m 辺の数
+     * @return 辺の情報から生成したグラフ(graph[i][j][k]：頂点ｉの次数がｊ－１で、graph[i][j]＝｛ vertex, cost ｝)
+     */
+    public static int[][][] buildDirectedWeightedGraph(Scanner sc, int n, int m) {
+        int[][][] graph = new int[n][][];
+        int[][] edges = new int[m][3];
+        int[] deg = new int[n];
+        for (int i = 0; i < m; i++) {
+            int a = sc.nextInt()-1;
+            int b = sc.nextInt()-1;
+            int c = sc.nextInt();
+            edges[i][0] = a;
+            edges[i][1] = b;
+            edges[i][2] = c;
+            deg[a]++;
+        }
+        for (int i = 0; i < n; i++) {
+            graph[i] = new int[deg[i]][2];
+        }
+        for (int i = 0; i < m; i++) {
+            int a = edges[i][0];
+            int b = edges[i][1];
+            int c = edges[i][2];
+            graph[a][--deg[a]] = new int[]{b, c};
+        }
+
+        return graph;
+    }
+
 }
