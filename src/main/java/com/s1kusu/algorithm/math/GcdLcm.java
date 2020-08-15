@@ -5,16 +5,38 @@ package com.s1kusu.algorithm.math;
 class GcdLcm {
 
     /**
-     * aとbの最大公約数を求める
-     * 計算量：O(log n)
+     * 最大公約数を求める.<br>
+     * 計算量：O(log n)<br>
+     * gcd(a, 0) または gcd(0, a) の場合 |a| が返却されます。
+     * gcd(0, 0) の場合 0 が返却されます。
+     * 引数が双方とも-2^31の場合は例外がスローされます。
      * @param a
      * @param b
-     * @return aとbの最大公約数
+     * @return 最大公約数
+     * @throws IllegalArgumentException 引数が双方とも-2^31の場合にスローされます
      */
     public static int gcd(int a, int b){
-        if(a < b) return gcd(b, a);
-        if(b == 0) return a;
-        return gcd(b, a%b);
+        // 引数が-2^31の場合、正の数に変換できないため調整する
+        if(a == Integer.MIN_VALUE && b == Integer.MIN_VALUE) {
+            throw new IllegalArgumentException();
+        }else if(a == Integer.MIN_VALUE) {
+            a /= 2;
+        }else if(b == Integer.MIN_VALUE) {
+            b /= 2;
+        }
+        a = Math.abs(a);
+        b = Math.abs(b);
+        if(a < b) {
+            int t = a;
+            a = b;
+            b = t;
+        }
+        while(b != 0) {
+            int r = a % b;
+            a = b;
+            b = r;
+        }
+        return a;
     }
 
     /**
