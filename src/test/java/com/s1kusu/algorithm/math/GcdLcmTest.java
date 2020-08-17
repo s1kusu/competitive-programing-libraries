@@ -29,10 +29,26 @@ public class GcdLcmTest {
         assertThrows(IllegalArgumentException.class, () -> {GcdLcm.gcd(Integer.MIN_VALUE, Integer.MIN_VALUE);});
     }
 
+    @Test
+    void testLcm() {
+        assertAll("lcm",
+                () -> assertEquals(36, GcdLcm.lcm(12, 18)),
+                () -> assertEquals(36, GcdLcm.lcm(18, 12)),
+                () -> assertEquals(5, GcdLcm.lcm(1, 5)),
+                () -> assertEquals(0, GcdLcm.lcm(0, 7)),
+                () -> assertEquals(0, GcdLcm.lcm(0, 0)),
+                () -> assertEquals(6, GcdLcm.lcm(-2, 3)),
+                () -> assertEquals(1000000016000000063L, GcdLcm.lcm(1000000007, 1000000009)),
+                () -> assertEquals(4611686011984936962L, GcdLcm.lcm(Integer.MAX_VALUE-1, Integer.MAX_VALUE)),
+                () -> assertEquals(4611686016279904256L, GcdLcm.lcm(Integer.MIN_VALUE+1, Integer.MIN_VALUE)),
+                () -> assertEquals(Integer.MIN_VALUE, GcdLcm.lcm(Integer.MIN_VALUE, Integer.MIN_VALUE))
+        );
+    }
+
     @Nested
     @Disabled
     class SpeedTest{
-        static final int N = 100_000_000;
+        static final int N = 50_000_000;
 
         @Test
         void testSpeedGcd() {
@@ -43,7 +59,19 @@ public class GcdLcmTest {
                 }
             });
             long endTime = System.currentTimeMillis();
-            System.out.printf("time to run gcd() %,d times : %,d ms", N, endTime - startTime);
+            System.out.printf("time to run gcd() %,d times : %,d ms%n", N, endTime - startTime);
+        }
+
+        @Test
+        void testSpeedLcm() {
+            long startTime = System.currentTimeMillis();
+            assertTimeoutPreemptively(ofMillis(1000), () -> {
+                for (int i = 0; i < N; i++) {
+                    GcdLcm.lcm(i+1, i+2);
+                }
+            });
+            long endTime = System.currentTimeMillis();
+            System.out.printf("time to run lcm() %,d times : %,d ms%n", N, endTime - startTime);
         }
     }
 }
