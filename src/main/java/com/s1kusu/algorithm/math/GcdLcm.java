@@ -9,7 +9,7 @@ class GcdLcm {
      * 計算量：O(log n)<br>
      * gcd(a, 0) または gcd(0, a) の場合 |a| が返却されます。
      * gcd(0, 0) の場合 0 が返却されます。
-     * 引数が双方とも-2^31の場合は例外がスローされます。
+     * 引数が双方とも-2^31の場合は適切な値を返却できないため例外がスローされます。
      * @param a
      * @param b
      * @return 最大公約数
@@ -40,14 +40,16 @@ class GcdLcm {
     }
 
     /**
-     * aとbの最小公倍数を求める
-     * 計算量：O(log n)
+     * aとbの最小公倍数(正の倍数のうち最小のもの)を求める.<br>
+     * 計算量：O(log n)<br>
+     * 引数が1つ以上０である場合0が返却されます。
      * @param a
      * @param b
-     * @return aとbの最小公倍数
+     * @return 最小公倍数
      */
-    public static int lcm(int a, int b){
-        return a * b / gcd(a, b);
+    public static long lcm(int a, int b){
+        if(a == b) return a;
+        return Math.abs((long)a * b / gcd(a, b));
     }
 
     /**
