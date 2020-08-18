@@ -45,10 +45,52 @@ public class GcdLcmTest {
         );
     }
 
+    @Test
+    void testGcdEx() {
+        assertAll("gcdEx",
+                () -> {
+                    int[] res = GcdLcm.gcdEx(18, 12);
+                    assertEquals(6, res[0]);
+                    assertEquals(1, res[1]);
+                    assertEquals(-1, res[2]);
+                },
+                () -> {
+                    int[] res = GcdLcm.gcdEx(12, 18);
+                    assertEquals(6, res[0]);
+                    assertEquals(-1, res[1]);
+                    assertEquals(1, res[2]);
+                },
+                () -> {
+                    int[] res = GcdLcm.gcdEx(5, 7);
+                    assertEquals(1, res[0]);
+                    assertEquals(3, res[1]);
+                    assertEquals(-2, res[2]);
+                },
+                () -> {
+                    int[] res = GcdLcm.gcdEx(0, 42);
+                    assertEquals(42, res[0]);
+                    assertEquals(0, res[1]);
+                    assertEquals(1, res[2]);
+                },
+                () -> {
+                    int[] res = GcdLcm.gcdEx(42, 0);
+                    assertEquals(42, res[0]);
+                    assertEquals(1, res[1]);
+                    assertEquals(0, res[2]);
+                },
+                () -> {
+                    int[] res = GcdLcm.gcdEx(0, 0);
+                    assertEquals(0, res[0]);
+                    assertEquals(1, res[1]);
+                    assertEquals(0, res[2]);
+                }
+        );
+    }
+
     @Nested
-    @Disabled
+//    @Disabled
     class SpeedTest{
-        static final int N = 50_000_000;
+        static final int N = 20_000_000;
 
         @Test
         void testSpeedGcd() {
@@ -72,6 +114,18 @@ public class GcdLcmTest {
             });
             long endTime = System.currentTimeMillis();
             System.out.printf("time to run lcm() %,d times : %,d ms%n", N, endTime - startTime);
+        }
+
+        @Test
+        void testSpeedGdcEx() {
+            long startTime = System.currentTimeMillis();
+            assertTimeoutPreemptively(ofMillis(1000), () -> {
+                for (int i = 0; i < N; i++) {
+                    GcdLcm.gcdEx(i+1, i+2);
+                }
+            });
+            long endTime = System.currentTimeMillis();
+            System.out.printf("time to run gcdEx() %,d times : %,d ms%n", N, endTime - startTime);
         }
     }
 }
