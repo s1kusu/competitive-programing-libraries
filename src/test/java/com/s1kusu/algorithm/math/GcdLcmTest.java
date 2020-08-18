@@ -88,7 +88,7 @@ public class GcdLcmTest {
     }
 
     @Nested
-//    @Disabled
+    @Disabled
     class SpeedTest{
         static final int N = 20_000_000;
 
