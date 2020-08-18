@@ -7,13 +7,13 @@ class GcdLcm {
     /**
      * 最大公約数を求める.<br>
      * 計算量：O(log n)<br>
-     * gcd(a, 0) または gcd(0, a) の場合 |a| が返却されます。
-     * gcd(0, 0) の場合 0 が返却されます。
-     * 引数が双方とも-2^31の場合は適切な値を返却できないため例外がスローされます。
+     * gcd(a, 0) または gcd(0, a) の場合 |a| が返却される。
+     * gcd(0, 0) の場合 0 が返却される。
+     * 引数が双方とも-2^31の場合は適切な値を返却できないため例外がスローされる。
      * @param a
      * @param b
      * @return 最大公約数
-     * @throws IllegalArgumentException 引数が双方とも-2^31の場合にスローされます
+     * @throws IllegalArgumentException 引数が双方とも-2^31の場合にスローされる
      */
     public static int gcd(int a, int b){
         // 引数が-2^31の場合、正の数に変換できないため調整する
@@ -42,7 +42,7 @@ class GcdLcm {
     /**
      * aとbの最小公倍数(正の倍数のうち最小のもの)を求める.<br>
      * 計算量：O(log n)<br>
-     * 引数が1つ以上０である場合0が返却されます。
+     * 引数が1つ以上０である場合0が返却される。
      * @param a
      * @param b
      * @return 最小公倍数
@@ -53,23 +53,23 @@ class GcdLcm {
     }
 
     /**
-     * (拡張ユークリッドの互除法)aとbの最大公約数を求める.
-     * xとyには [ax + by = gcd(a, b)]を満たす(x、y)が格納される.
+     * (拡張ユークリッドの互除法)aとbの最大公約数を求める.<br>
+     * x と y には ax + by = gcd(a, b) を満たす(x, y)となる。
+     * 引数に負の数が含まれる場合の動作は保証されない。
      * 計算量：O(min(a,b))
      * @param a
      * @param b
-     * @param x
-     * @param y
-     * @return aとbの最大公約数
+     * @return {gcd(a, b), x, y}
      */
-    public static int gcdEx(int a, int b, Integer x, Integer y){
+    public static int[] gcdEx(int a, int b){
         if(b == 0){
-            x = 1;
-            y = 0;
-            return a;
+            return new int[] {a, 1, 0};
         }
-        int d = gcdEx(b, a%b, y, x);
+        int[] gcdYX = gcdEx(b, a%b);
+        int gcd = gcdYX[0];
+        int y = gcdYX[1];
+        int x = gcdYX[2];
         y -= a/b * x;
-        return d;
+        return new int[] {gcd, x, y};
     }
 }
