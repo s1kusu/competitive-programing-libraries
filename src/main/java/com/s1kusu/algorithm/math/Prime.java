@@ -2,6 +2,7 @@ package com.s1kusu.algorithm.math;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.TreeMap;
 
 /**
  * 素数に関する処理を提供するクラス。
@@ -10,27 +11,29 @@ import java.util.Arrays;
 class Prime {
 
     /**
-     * 素数判定をする。
+     * 素数判定をする.<br>
      * 計算量：O(√n)
-     * @param n 判定対象の数（自然数）
+     * @param n 判定対象の数
      * @return 判定対象が素数であればtrue、そうでなければfalseを返す。
      */
     public static boolean isPrime(int n){
-        for (int i = 2; i * i <= n; i++) {
+        if(n < 2) return false;
+        for (int i = 2; i <= Math.sqrt(n); i++) {
             if(n % i == 0) return false;
         }
         return n != 1;
     }
 
     /**
-     * 約数を列挙する。
-     * 計算量：O(nlogn)
-     * @param n 約数を列挙する対象の数（自然数）
-     * @return 対象の約数が昇順に格納された配列
+     * 約数を列挙する.<br>
+     * 計算量：O(√n)
+     * @param n 約数を列挙する対象の数
+     * @return 対象の約数が昇順に格納された配列。
      */
     public static int[] getDivisor(int n){
+        if(n < 1) return new int[0];
         ArrayList<Integer> list = new ArrayList<>();
-        for (int i = 1; i * i <= n; i++) {
+        for (int i = 1; i <= Math.sqrt(n); i++) {
             if(n % i == 0){
                 list.add(i);
                 if(i != n / i) list.add(n / i);
@@ -43,39 +46,42 @@ class Prime {
     }
 
     /**
-     * 素因数分解する。
-     * 返却される配列をaとすると、nには素因数pがa[p]個含まれることを表す。
-     * @param n 素因数分解する対象の数（自然数）
-     * @return 素因数分解した結果が格納された配列
+     * 素因数分解する.<br>
+     * 計算量：O(√n)
+     * @param n 素因数分解する対象の数
+     * @return (素因数, 素因数の指数)となるマップ
      */
-    public static int[] getPrimeFactors(int n){
-        int[] ret = new int[n+1];
-        for (int i = 2; i * i <= n; i++) {
+    public static TreeMap<Integer, Integer> getPrimeFactors(int n){
+        TreeMap<Integer, Integer> ret = new TreeMap<>();
+        if(n < 2) return ret;
+        for (int i = 2; i <= Math.sqrt(n); i++) {
             while(n % i == 0){
-                ret[i]++;
+                ret.merge(i, 1, Integer::sum);
                 n /= i;
             }
         }
-        if(n != 1) ret[n]++;
+        if(n != 1) ret.put(n, 1);
         return ret;
     }
 
     /**
-     * 配列に含まれる数をすべて掛け合わせた数を素因数分解する。
+     * 配列に含まれる数をすべて掛け合わせた数を素因数分解する.<br>
+     * 配列に2より小さい数が含まれる場合、その数はスキップされる。<br>
+     * 計算量：O(|a|√x)
      * @param a 掛け合わせる数が格納された配列
-     * @param n 配列aに含まれる数の最大値
-     * @return 素因数分解した結果が格納された配列
+     * @return (素因数, 素因数の指数)となるマップ
      */
-    public static int[] getPrimeFactors(int[] a, int n){
-        int[] ret = new int[n+1];
+    public static TreeMap<Integer, Integer> getPrimeFactors(int[] a){
+        TreeMap<Integer, Integer> ret = new TreeMap<>();
         for(int x : a){
-            for (int i = 2; i * i <= x; i++) {
+            if(x < 2) continue;
+            for (int i = 2; i <= Math.sqrt(x); i++) {
                 while(x % i == 0){
-                    ret[i]++;
+                    ret.merge(i, 1, Integer::sum);
                     x /= i;
                 }
             }
-            if(x != 1) ret[x]++;
+            if(x != 1) ret.merge(x, 1, Integer::sum);
         }
         return ret;
     }
@@ -91,13 +97,13 @@ class Prime {
     }
     /**
      * from-toの範囲の素数を求める。
-     * (エラトステネスの篩)
      * 計算量：O(nloglogn)
      * @param from 素数を求める範囲の最小値(この値を含む)
      * @param to 素数を求める範囲の最大値(この値を含む)
      * @return from-toの範囲の素数が昇順に格納された配列
      */
     public static int[] getPrimeNumbers(int from, int to){
+        if(to < from || to < 2) return new int[0];
         int[] ret = new int[to+1];
         boolean[] prime = new boolean[to+1];
         Arrays.fill(prime, true);
