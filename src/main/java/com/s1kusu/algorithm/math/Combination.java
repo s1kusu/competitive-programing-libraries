@@ -1,6 +1,6 @@
 package com.s1kusu.algorithm.math;
 /**
- * フェルマーの小定理を用いて組み合わせの数を算出するクラス
+ * フェルマーの小定理を用いて組み合わせの数を算出するクラス.
  */
 class Combination {
 
@@ -12,8 +12,9 @@ class Combination {
     private int mod;
 
     /**
-     * コンストラクタ
-     * @param size 組み合わせの対象となる個数
+     * コンストラクタ<br>
+     * 計算量：O(n log n)
+     * @param size 組み合わせの対象となる個数の最大値
      * @param mod 除数
      */
     public Combination(int size, int mod){
@@ -25,13 +26,19 @@ class Combination {
         this.inv[0] = 1;
 
         for(int i = 1; i <= size; i++){
-            fac[i] = (fac[i -1] * i) %mod;
-            inv[i] = modPow(fac[i], (int)mod -2) %mod;
+            fac[i] = fac[i-1] * i %mod;
+            inv[i] = modPow(fac[i], mod - 2);
         }
     }
 
     /**
-     * n個の中からr個選ぶ組み合わせの数（nCr）をmodで割った余りを算出する
+     * n個の中からr個選ぶ組み合わせの数（nCr）をmodで割った余りを算出する<br>
+     * 引数は以下の制約を満たす必要があり、それ以外の場合の動作は保証されない。<br>
+     * <ul>
+     * <li>0 &lt; n, r &lt; size</li>
+     * <li>r &lt;= n</li>
+     * </ul>
+     * 計算量：O(1)
      * @param n 元の集合の要素数
      * @param r 組み合わせる要素数
      * @return nCr % mod
@@ -41,7 +48,8 @@ class Combination {
     }
 
     /**
-     * base^exp をmodで割った余りを算出する
+     * base^exp をmodで割った余りを算出する.<br>
+     * 計算量：O(log exq)
      * @param base 基数
      * @param exp 指数
      * @return base^exp % mod
