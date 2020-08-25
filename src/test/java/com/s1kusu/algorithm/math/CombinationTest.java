@@ -18,4 +18,16 @@ public class CombinationTest {
         assertEquals(999949972, c.comb(100_000, 2));
     }
 
+    @Test
+    void testPerm() {
+        Combination c = new Combination(200_000, 1_000_000_007);
+        assertEquals(1, c.perm(1, 1));
+        assertEquals(1, c.perm(1, 0));
+        assertEquals(10, c.perm(10, 1));
+        assertEquals(90, c.perm(10, 2));
+        assertEquals(720, c.perm(10, 3));
+        assertEquals(200_000, c.perm(200_000, 1));
+        assertEquals(999899937, c.perm(100_000, 2));
+    }
+
 }
