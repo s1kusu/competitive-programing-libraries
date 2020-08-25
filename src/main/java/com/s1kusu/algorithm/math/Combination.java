@@ -1,6 +1,6 @@
 package com.s1kusu.algorithm.math;
 /**
- * フェルマーの小定理を用いて組み合わせの数を算出するクラス.
+ * フェルマーの小定理を用いて順列・組み合わせの数を算出するクラス.
  */
 class Combination {
 
@@ -45,6 +45,22 @@ class Combination {
      */
     public long comb(int n, int r){
         return fac[n] * inv[r] %mod * inv[n - r] %mod;
+    }
+
+    /**
+     * n個の中からr個選んで並べる並べ方の数（nPr）をmodで割った余りを算出する<br>
+     * 引数は以下の制約を満たす必要があり、それ以外の場合の動作は保証されない。<br>
+     * <ul>
+     * <li>0 &lt; n, r &lt; size</li>
+     * <li>r &lt;= n</li>
+     * </ul>
+     * 計算量：O(1)
+     * @param n 元の集合の要素数
+     * @param r 並べる要素数
+     * @return nPr % mod
+     */
+    public long perm(int n, int r){
+        return fac[n] * inv[n - r] %mod;
     }
 
     /**
