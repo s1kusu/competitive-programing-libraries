@@ -33,49 +33,41 @@ class Combination {
 
     /**
      * n個の中からr個選ぶ組み合わせの数（nCr）をmodで割った余りを算出する<br>
-     * 引数は以下の制約を満たす必要があり、それ以外の場合の動作は保証されない。<br>
-     * <ul>
-     * <li>0 &lt;= n, r &lt;= size</li>
-     * <li>r &lt;= n</li>
-     * </ul>
+     * nはsize以下である必要があります。<br>
      * 計算量：O(1)
      * @param n 元の集合の要素数
      * @param r 組み合わせる要素数
      * @return nCr % mod
      */
     public long comb(int n, int r){
+        if(n < 0 || r < 0 || n < r) return 0;
         return fac[n] * inv[r] %mod * inv[n - r] %mod;
     }
 
     /**
      * n個の中からr個選んで並べる並べ方の数（nPr）をmodで割った余りを算出する<br>
-     * 引数は以下の制約を満たす必要があり、それ以外の場合の動作は保証されない。<br>
-     * <ul>
-     * <li>0 &lt;= n, r &lt;= size</li>
-     * <li>r &lt;= n</li>
-     * </ul>
+     * nはsize以下である必要があります。<br>
      * 計算量：O(1)
      * @param n 元の集合の要素数
      * @param r 並べる要素数
      * @return nPr % mod
      */
     public long perm(int n, int r){
+        if(n < 0 || r < 0 || n < r) return 0;
         return fac[n] * inv[n - r] %mod;
     }
 
     /**
      * n種類の中から重複を許してr個選ぶ重複組み合わせの数（nHr）をmodで割った余りを算出する<br>
-     * 引数は以下の制約を満たす必要があり、それ以外の場合の動作は保証されない。<br>
-     * <ul>
-     * <li>0 &lt;= n, r</li>
-     * <li>0 &lt;= n-1, n+r-1 &lt;= size</li>
-     * </ul>
+     * n+r-1はsize以下である必要があります。<br>
      * 計算量：O(1)
-     * @param n 元の集合の要素数
+     * @param n 元の集合の種類数
      * @param r 組み合わせる要素数
-     * @return nCr % mod
+     * @return nHr % mod
      */
     public long hom(int n, int r){
+        if(n == 0 && r == 0) return 1;
+        if(n <= 0 || r < 0) return 0;
         return fac[n + r - 1] * inv[r] %mod * inv[n - 1] %mod;
     }
 

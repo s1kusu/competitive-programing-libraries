@@ -9,6 +9,10 @@ public class CombinationTest {
     @Test
     void testComb() {
         Combination c = new Combination(200_000, 1_000_000_007);
+        assertEquals(0, c.comb(0, 1));
+        assertEquals(0, c.comb(1, -1));
+        assertEquals(0, c.comb(-1, -1));
+        assertEquals(1, c.comb(0, 0));
         assertEquals(1, c.comb(1, 1));
         assertEquals(1, c.comb(1, 0));
         assertEquals(1, c.comb(200_000, 200_000));
@@ -21,6 +25,10 @@ public class CombinationTest {
     @Test
     void testPerm() {
         Combination c = new Combination(200_000, 1_000_000_007);
+        assertEquals(0, c.perm(0, 1));
+        assertEquals(0, c.perm(1, -1));
+        assertEquals(0, c.perm(-1, -1));
+        assertEquals(1, c.perm(0, 0));
         assertEquals(1, c.perm(1, 1));
         assertEquals(1, c.perm(1, 0));
         assertEquals(10, c.perm(10, 1));
@@ -33,6 +41,10 @@ public class CombinationTest {
     @Test
     void testHom() {
         Combination c = new Combination(200_000, 1_000_000_007);
+        assertEquals(0, c.hom(0, 1));
+        assertEquals(0, c.hom(1, -1));
+        assertEquals(0, c.hom(-1, 1));
+        assertEquals(1, c.hom(0, 0));
         assertEquals(1, c.hom(1, 1));
         assertEquals(1, c.hom(1, 0));
         assertEquals(10, c.hom(10, 1));
