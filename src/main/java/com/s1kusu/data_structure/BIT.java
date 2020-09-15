@@ -1,19 +1,48 @@
 package com.s1kusu.data_structure;
 
 /**
- * BinaryIndexedTree
- *
+ * BinaryIndexedTree.<br>
+ * 長さnの配列に対し以下の操作をO(logN)で行うデータ構造.
+ * <ul>
+ * <li>add ：要素の1点変更</li>
+ * <li>sum：区間の要素の総和</li>
+ * </ul>
+ * 要素のIndexは1-indexed.
  */
-public class BIT {
+class BIT {
 
-    public int n;
-    public long[] bit;
+    private int n;
+    private long[] bit;
 
+    /**
+     * コンストラクタ.<br>
+     * 長さ n+1、初期値 0の配列を生成する.<br>
+     * 計算量：O(N)
+     * @param n
+     */
     public BIT(int n){
         this.n = n;
-        bit = new long[n+1];
+        this.bit = new long[n+1];
     }
 
+    /**
+     * i番目の要素にxを加算する.<br>
+     * 計算量：O(logN)
+     * @param i
+     * @param x
+     */
+    public void add(int i, int x){
+        while(i <= n){
+            bit[i] += x;
+            i += i & -i;
+        }
+    }
+
+    /**
+     * 0～i番目までの要素の総和.<br>
+     * 計算量：O(logN)
+     * @param i
+     */
     public long sum(int i){
         long s = 0L;
         while(0 < i){
@@ -23,13 +52,22 @@ public class BIT {
         return s;
     }
 
-    public void add(int i, int x){
-        while(i <= n){
-            bit[i] += x;
-            i += i & -i;
-        }
+    /**
+     * l～r番目までの要素の総和.<br>
+     * 計算量：O(logN)
+     * @param l
+     * @param r
+     */
+    public long sum(int l, int r) {
+        return sum(r) - sum(l-1);
     }
 
+    /**
+     * k ≦ sum(x) となる最小のxを求める.<br>
+     * 計算量：O(logN)
+     * @param k
+     * @return
+     */
     public int lowerBound(int k){
         if(k <= 0) return 0;
         int x = 0;
@@ -45,3 +83,4 @@ public class BIT {
     }
 
 }
+
