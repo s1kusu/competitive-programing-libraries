@@ -1,23 +1,23 @@
 package com.s1kusu.data_structure.segmentTree;
 
 import java.util.Arrays;
-import java.util.function.IntBinaryOperator;
-import java.util.function.IntPredicate;
+import java.util.function.BinaryOperator;
+import java.util.function.Predicate;
 
 /**
  * Segment Tree.<br>
  * (0-indexed.)
  */
-class SegTree {
+class SegTree<T> {
 
     /** SegTreeで扱う要素数 */
     private final int N;
     /** nより大きい最小の2の累乗数 */
     private final int SIZE;
     /** 単位元 */
-    private final int E;
+    private final T E;
     /** 演算 */
-    private final IntBinaryOperator OP;
+    private final BinaryOperator<T> OP;
     /**
      * 要素全体を含むノードのindex：0.
      * k番目(0-indexed)の要素のindex：k + size - 1
@@ -25,7 +25,7 @@ class SegTree {
      * ノードkの子要素のうち左側のindex：k*2+1.
      * ノードkの子要素のうち右側のindex：k*2+2.
      */
-    private final int[] DATA;
+    private final T[] DATA;
 
     /**
      * 全てのノードを単位元で初期化するコンストラクタ.<br>
@@ -34,14 +34,15 @@ class SegTree {
      * @param e 単位元
      * @param op 演算
      */
-    public SegTree(int n, int e, IntBinaryOperator op){
+    @SuppressWarnings("unchecked")
+    public SegTree(int n, T e, BinaryOperator<T> op){
         int tmpSize = 1;
         while(tmpSize < n) tmpSize *= 2;
         this.N = n;
         this.E = e;
         this.OP = op;
         this.SIZE = tmpSize;
-        this.DATA = new int[SIZE*2];
+        this.DATA = (T[]) new Object[SIZE*2];
         Arrays.fill(DATA, e);
     }
 
@@ -52,14 +53,15 @@ class SegTree {
      * @param e 単位元
      * @param op 演算
      */
-    public SegTree(int[] a, int e, IntBinaryOperator op){
+    @SuppressWarnings("unchecked")
+    public SegTree(T[] a, T e, BinaryOperator<T> op){
         int tmpSize = 1;
         while(tmpSize < a.length) tmpSize *= 2;
         this.N = a.length;
         this.E = e;
         this.OP = op;
         this.SIZE = tmpSize;
-        this.DATA = new int[SIZE*2];
+        this.DATA = (T[]) new Object[SIZE*2];
         Arrays.fill(DATA, e);
         for (int i = 0; i < N; i++) DATA[i + SIZE - 1] = a[i];
         for (int i = SIZE-2; i >= 0; i--) update(i);
@@ -71,7 +73,7 @@ class SegTree {
      * @param k
      * @return k番目の要素の値
      */
-    public int get(int k) {
+    public T get(int k) {
         return DATA[k + SIZE - 1];
     }
 
@@ -81,7 +83,7 @@ class SegTree {
      * @param k 変更対象要素のindex（0-indexed）
      * @param v 変更後の値
      */
-    public void set(int k, int v){
+    public void set(int k, T v){
         k += SIZE - 1;
         DATA[k] = v;
         while(0 < k){
@@ -96,7 +98,7 @@ class SegTree {
      * @param k
      */
     private void update(int k) {
-        DATA[k] = OP.applyAsInt(DATA[k * 2 + 1], DATA[k * 2 + 2]);
+        DATA[k] = OP.apply(DATA[k * 2 + 1], DATA[k * 2 + 2]);
     }
 
     /**
@@ -106,7 +108,7 @@ class SegTree {
      * @param r 求める区間の上限（含まない）
      * @return 区間[a, b)の結果
      */
-    public int query(int l, int r){
+    public T query(int l, int r){
         return query(l, r, 0, 0, SIZE);
     }
 
@@ -119,14 +121,14 @@ class SegTree {
      * @param b 確認するノードの上限（含まない）
      * @return 区間[a, b)の結果
      */
-    private int query(int l, int r, int k, int a, int b){
+    private T query(int l, int r, int k, int a, int b){
         if(b <= l || r <= a) return E;
 
         if(l <= a && b <= r) return DATA[k];
 
-        int vl = query(l, r, k*2+1, a, (a+b)/2);
-        int vr = query(l, r, k*2+2, (a+b)/2, b);
-        return OP.applyAsInt(vl, vr);
+        T vl = query(l, r, k*2+1, a, (a+b)/2);
+        T vr = query(l, r, k*2+2, (a+b)/2, b);
+        return OP.apply(vl, vr);
     }
 
     /**
@@ -137,7 +139,7 @@ class SegTree {
      * @param pr 判定条件
      * @return 条件を満たす最大のIndex
      */
-    public int maxRight(int l, IntPredicate pr) {
+    public int maxRight(int l, Predicate<T> pr) {
         return maxRight(l, N, pr);
     }
 
@@ -151,12 +153,12 @@ class SegTree {
      * @param pr 判定条件
      * @return 条件を満たす最大のIndex
      */
-    public int maxRight(int l, int r, IntPredicate pr) {
+    public int maxRight(int l, int r, Predicate<T> pr) {
         int idx = l + SIZE - 1;
         int li = l, ri = l, width = 1;
-        int applied = E;
+        T applied = E;
         while(ri < SIZE) {
-            int tmp = OP.applyAsInt(applied, DATA[idx]);
+            T tmp = OP.apply(applied, DATA[idx]);
             if(ri < r && pr.test(tmp)) {
                 applied = tmp;
                 if((idx&1) == 1) {
