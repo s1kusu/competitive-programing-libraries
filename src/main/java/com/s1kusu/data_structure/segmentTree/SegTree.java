@@ -6,17 +6,17 @@ import java.util.function.Predicate;
 
 /**
  * Segment Tree.<br>
- * (0-indexed.)
+ * (0-indexed)
  */
 class SegTree<T> {
 
-    /** SegTreeで扱う要素数 */
+    /** 要素数 */
     private final int N;
     /** nより大きい最小の2の累乗数 */
     private final int SIZE;
     /** 単位元 */
     private final T E;
-    /** 演算 */
+    /** クエリ結果を求める関数 */
     private final BinaryOperator<T> OP;
     /**
      * 要素全体を含むノードのindex：1.

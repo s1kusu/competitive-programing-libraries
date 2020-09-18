@@ -6,15 +6,19 @@ import java.util.function.BinaryOperator;
 import java.util.function.Supplier;
 
 /**
- * Lazy Segment Tree.
- *
+ * Lazy Segment Tree.<br>
+ * (0-indexed)
  */
 class LazySegTree<T, S> {
 
+    /** 要素数 */
     private final int N;
+    /** Nより大きい最小の2の累乗数 */
     private final int SIZE;
+    /** 2 ^ LOG = SIZE */
     private final int LOG;
     /**
+     * データ配列.
      * 要素全体を含むノードのindex：1.
      * k番目(0-indexed)の要素のindex：k + size
      * ノードkの親要素のindex：k/2.
@@ -22,13 +26,29 @@ class LazySegTree<T, S> {
      * ノードkの子要素のうち右側のindex：k*2+1.
      */
     private final T[] DATA;
+    /** 遅延評価配列 */
     private final S[] LAZY;
+    /** データの単位元供給関数 */
     private final Supplier<T> ET;
+    /** クエリ結果を求める関数 */
     private final BinaryOperator<T> OP;
+    /** 遅延評価の単位元供給関数 */
     private final Supplier<S> ES;
+    /** 遅延分をデータに適用する関数 */
     private final BiFunction<T, S, T> MAPPING;
+    /** 遅延分を合成する関数 */
     private final BinaryOperator<S> COMPOSITION;
 
+    /**
+     * 全てのノードを単位元で初期化するコンストラクタ.<br>
+     * 計算量：O(N)
+     * @param n
+     * @param et
+     * @param op
+     * @param es
+     * @param mapping
+     * @param composition
+     */
     @SuppressWarnings("unchecked")
     public LazySegTree(int n, Supplier<T> et, BinaryOperator<T> op, Supplier<S> es,
             BiFunction<T, S, T> mapping, BinaryOperator<S> composition){
@@ -51,6 +71,16 @@ class LazySegTree<T, S> {
         Arrays.fill(LAZY, ES.get());
     }
 
+    /**
+     * 引数で指定された配列で初期化するコンストラクタ.<br>
+     * 計算量：O(N)
+     * @param a
+     * @param et
+     * @param op
+     * @param es
+     * @param mapping
+     * @param composition
+     */
     @SuppressWarnings("unchecked")
     public LazySegTree(T[] a, Supplier<T> et, BinaryOperator<T> op, Supplier<S> es,
             BiFunction<T, S, T> mapping, BinaryOperator<S> composition){
@@ -123,6 +153,12 @@ class LazySegTree<T, S> {
         DATA[k] = OP.apply(DATA[k*2], DATA[k*2+1]);
     }
 
+    /**
+     * k番目（0-indexed）の要素に s を適用する.<br>
+     * 計算量：O(logN)
+     * @param k 変更対象要素のindex（0-indexed）
+     * @param s 更新処理
+     */
     public void apply(int k, S s) {
         k += SIZE;
         for(int i = LOG; i >= 0; i--) eval(k >> i);
@@ -130,6 +166,14 @@ class LazySegTree<T, S> {
         for(int i = 1; i <= LOG; i++) update(k >> i);
     }
 
+
+    /**
+     * 区間[a, b)に s を適用する.<br>
+     * 計算量：O(logN)
+     * @param l 最終的に適用する区間の下限（含む）
+     * @param r 最終的に適用する区間上限（含まない）
+     * @param s 更新処理
+     */
     public void apply(int l, int r, S s) {
         apply(l, r, 1, 0, SIZE, s);
     }
