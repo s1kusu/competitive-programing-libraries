@@ -19,11 +19,11 @@ class SegTree<T> {
     /** 演算 */
     private final BinaryOperator<T> OP;
     /**
-     * 要素全体を含むノードのindex：0.
-     * k番目(0-indexed)の要素のindex：k + size - 1
-     * ノードkの親要素のindex：(k - 1) / 2.
-     * ノードkの子要素のうち左側のindex：k*2+1.
-     * ノードkの子要素のうち右側のindex：k*2+2.
+     * 要素全体を含むノードのindex：1.
+     * k番目(0-indexed)の要素のindex：k + size
+     * ノードkの親要素のindex：k/2.
+     * ノードkの子要素のうち左側のindex：k*2.
+     * ノードkの子要素のうち右側のindex：k*2+1.
      */
     private final T[] DATA;
 
@@ -39,9 +39,9 @@ class SegTree<T> {
         int tmpSize = 1;
         while(tmpSize < n) tmpSize *= 2;
         this.N = n;
+        this.SIZE = tmpSize;
         this.E = e;
         this.OP = op;
-        this.SIZE = tmpSize;
         this.DATA = (T[]) new Object[SIZE*2];
         Arrays.fill(DATA, e);
     }
@@ -58,23 +58,23 @@ class SegTree<T> {
         int tmpSize = 1;
         while(tmpSize < a.length) tmpSize *= 2;
         this.N = a.length;
+        this.SIZE = tmpSize;
         this.E = e;
         this.OP = op;
-        this.SIZE = tmpSize;
         this.DATA = (T[]) new Object[SIZE*2];
         Arrays.fill(DATA, e);
-        for (int i = 0; i < N; i++) DATA[i + SIZE - 1] = a[i];
-        for (int i = SIZE-2; i >= 0; i--) update(i);
+        for (int i = 0; i < N; i++) DATA[i + SIZE] = a[i];
+        for (int i = SIZE-1; i > 0; i--) update(i);
     }
 
     /**
-     * k番目の要素を取得する.
+     * k番目の要素を取得する.<br>
      * 計算量：O(1)
      * @param k
      * @return k番目の要素の値
      */
     public T get(int k) {
-        return DATA[k + SIZE - 1];
+        return DATA[k + SIZE];
     }
 
     /**
@@ -84,10 +84,10 @@ class SegTree<T> {
      * @param v 変更後の値
      */
     public void set(int k, T v){
-        k += SIZE - 1;
+        k += SIZE;
         DATA[k] = v;
         while(0 < k){
-            k = (k - 1) / 2;
+            k >>= 1;
             update(k);
         }
     }
@@ -98,7 +98,7 @@ class SegTree<T> {
      * @param k
      */
     private void update(int k) {
-        DATA[k] = OP.apply(DATA[k * 2 + 1], DATA[k * 2 + 2]);
+        DATA[k] = OP.apply(DATA[k*2], DATA[k*2+1]);
     }
 
     /**
@@ -109,7 +109,7 @@ class SegTree<T> {
      * @return 区間[a, b)の結果
      */
     public T query(int l, int r){
-        return query(l, r, 0, 0, SIZE);
+        return query(l, r, 1, 0, SIZE);
     }
 
     /**
@@ -126,8 +126,8 @@ class SegTree<T> {
 
         if(l <= a && b <= r) return DATA[k];
 
-        T vl = query(l, r, k*2+1, a, (a+b)/2);
-        T vr = query(l, r, k*2+2, (a+b)/2, b);
+        T vl = query(l, r, k*2, a, (a+b)/2);
+        T vr = query(l, r, k*2+1, (a+b)/2, b);
         return OP.apply(vl, vr);
     }
 
@@ -154,26 +154,26 @@ class SegTree<T> {
      * @return 条件を満たす最大のIndex
      */
     public int maxRight(int l, int r, Predicate<T> pr) {
-        int idx = l + SIZE - 1;
+        int idx = l + SIZE;
         int li = l, ri = l, width = 1;
         T applied = E;
         while(ri < SIZE) {
             T tmp = OP.apply(applied, DATA[idx]);
             if(ri < r && pr.test(tmp)) {
                 applied = tmp;
-                if((idx&1) == 1) {
+                if((idx&1) == 0) {
                     idx++;
                 }else {
-                    idx = (idx-1)/2 +1;
+                    idx = idx/2 +1;
                     width *= 2;
                 }
                 li = ri + 1;
                 ri = li + width -1;
             }else {
-                if(SIZE - 1 <= idx) {
+                if(SIZE <= idx) {
                     return li;
                 }
-                idx = idx*2+1;
+                idx = idx*2;
                 width /= 2;
                 ri -= width;
             }
