@@ -99,24 +99,10 @@ class LazySegTree<T, S> {
         this.ES = es;
         this.MAPPING = mapping;
         this.COMPOSITION = composition;
-        for (int i = 0; i < N; i++) DATA[i + SIZE] = a[i];
-        for(int i = N; i < SIZE; i++) DATA[i+SIZE] = ET.get();
-        for (int i = SIZE-1; i > 0; i--) update(i);
+        Arrays.fill(DATA, ET.get());
         Arrays.fill(LAZY, ES.get());
-    }
-
-    /**
-     * 指定したノードに遅延分を反映し、子ノードの遅延評価待ちを設定する。<br>
-     * 計算量：O(1)
-     * @param k 自ノードのindex
-     */
-    public void eval(int k){
-        DATA[k] = MAPPING.apply(DATA[k], LAZY[k]);
-        if(k < SIZE-1) {
-            LAZY[2*k] = COMPOSITION.apply(LAZY[k], LAZY[2*k]);
-            LAZY[2*k+1] = COMPOSITION.apply(LAZY[k], LAZY[2*k+1]);
-        }
-        LAZY[k] = ES.get();
+        for (int i = 0; i < N; i++) DATA[i + SIZE] = a[i];
+        for (int i = SIZE-1; i > 0; i--) update(i);
     }
 
     /**
@@ -127,7 +113,7 @@ class LazySegTree<T, S> {
      */
     public T get(int k) {
         k += SIZE;
-        for(int i = LOG; i >= 0; i--) eval(k >> i);
+        for(int i = LOG; i >= 1; i--) push(k >> i);
         return DATA[k];
     }
 
@@ -139,18 +125,9 @@ class LazySegTree<T, S> {
      */
     public void set(int k, T v){
         k += SIZE;
-        for(int i = LOG; i >= 0; i--) eval(k >> i);
+        for(int i = LOG; i >= 1; i--) push(k >> i);
         DATA[k] = v;
         for(int i = 1; i <= LOG; i++) update(k >> i);
-    }
-
-    /**
-     * ノードkに演算を適用する.<br>
-     * 計算量：O(1)
-     * @param k
-     */
-    private void update(int k) {
-        DATA[k] = OP.apply(DATA[k*2], DATA[k*2+1]);
     }
 
     /**
@@ -161,7 +138,7 @@ class LazySegTree<T, S> {
      */
     public void apply(int k, S s) {
         k += SIZE;
-        for(int i = LOG; i >= 0; i--) eval(k >> i);
+        for(int i = LOG; i >= 1; i--) push(k >> i);
         DATA[k] = MAPPING.apply(DATA[k], s);
         for(int i = 1; i <= LOG; i++) update(k >> i);
     }
@@ -175,36 +152,29 @@ class LazySegTree<T, S> {
      * @param s 更新処理
      */
     public void apply(int l, int r, S s) {
-        apply(l, r, 1, 0, SIZE, s);
-    }
+        if(l == r) return;
 
-    /**
-     * 区間[a, b)に s を適用する.<br>
-     * 計算量：O(logN)
-     * @param l 最終的に適用する区間の下限（含む）
-     * @param r 最終的に適用する区間上限（含まない）
-     * @param k 今見ているノードのindex
-     * @param a 今見ているノードの下限（含む）
-     * @param b 今見ているノードの上限（含まない）
-     * @param s 更新処理
-     */
-    private void apply(int l, int r, int k, int a, int b, S s){
-        eval(k);
+        l += SIZE;
+        r += SIZE;
 
-        // 区間外
-        if(r <= a || b <= l) return;
-
-        // 完全に含む
-        if(l <= a && b <= r){
-            LAZY[k] = COMPOSITION.apply(LAZY[k], s);
-            eval(k);
-            return;
+        for (int i = LOG; i >= 1; i--) {
+            if(((l >> i) << i) != l) push(l >> i);
+            if(((r >> i) << i) != r) push((r-1) >> i);
         }
 
-        // それ以外
-        apply(l, r, 2*k, a, (a+b)/2, s);
-        apply(l, r, 2*k+1, (a+b)/2, b, s);
-        update(k);
+        int l2 = l, r2 = r;
+        while(l2 < r2) {
+            if((l2 & 1) == 1) allApply(l2++, s);
+            if((r2 & 1) == 1) allApply(--r2, s);;
+            l2 >>= 1;
+            r2 >>= 1;
+        }
+
+        for (int i = 1; i <= LOG; i++) {
+            if(((l >> i) << i) != l) update(l >> i);
+            if(((r >> i) << i) != r) update((r-1) >> i);
+        }
+
     }
 
     /**
@@ -214,29 +184,50 @@ class LazySegTree<T, S> {
      * @param r 求める区間の上限（含まない）
      * @return 区間[l, r)の結果
      */
-    public T query(int l, int r){
-        return query(l, r, 1, 0, SIZE);
+    public T prod(int l, int r){
+        if(l == r) return ET.get();
+
+        l += SIZE;
+        r += SIZE;
+
+        for (int i = LOG; i >= 1; i--) {
+            if(((l >> i) << i) != l) push(l >> i);
+            if(((r >> i) << i) != r) push(r >> i);
+        }
+
+        T sml = ET.get(), smr = ET.get();
+        while(l < r) {
+            if((l & 1) == 1) sml = OP.apply(sml, DATA[l++]);
+            if((r & 1) == 1) smr = OP.apply(DATA[--r], smr);
+            l >>= 1;
+            r >>= 1;
+        }
+
+        return OP.apply(sml, smr);
     }
 
+
     /**
-     * 区間[l, r)の結果を求める.<br>
-     * 計算量：O(logN)
-     * @param l 求める区間の下限（含む）
-     * @param r 求める区間の上限（含まない）
-     * @param k 確認するノードのindex
-     * @param a 確認するノードの下限（含む）
-     * @param b 確認するノードの上限（含まない）
-     * @return 区間[l, r)の結果
+     * 全区間[0, n)の結果を求める.<br>
+     * 計算量：O(1)
+     * @return 区間[0, r)の結果
      */
-    private T query(int l, int r, int k, int a, int b){
-        // 区間外
-        if(r <= a || b <= l) return ET.get();
-        eval(k);
-        // 完全に含む
-        if(l <= a && b <= r) return DATA[k];
-        // それ以外
-        T vl = query(l, r, 2*k, a, (a+b)/2);
-        T vr = query(l, r, 2*k+1, (a+b)/2, b);
-        return OP.apply(vl, vr);
+    public T allProd() {
+        return DATA[1];
+    }
+
+    private void push(int k){
+        allApply(2*k, LAZY[k]);
+        allApply(2*k + 1, LAZY[k]);
+        LAZY[k] = ES.get();
+    }
+
+    private void allApply(int k, S s) {
+        DATA[k] = MAPPING.apply(DATA[k], s);
+        if(k < SIZE) LAZY[k] = COMPOSITION.apply(LAZY[k], s);
+    }
+
+    private void update(int k) {
+        DATA[k] = OP.apply(DATA[k*2], DATA[k*2+1]);
     }
 }
